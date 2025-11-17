@@ -1,0 +1,67 @@
+name: Build Test DMG
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-dmg:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Create test app structure
+        run: |
+          mkdir -p TestApp.app/Contents/MacOS
+          mkdir -p TestApp.app/Contents/Resources
+          
+          echo '#!/bin/bash' > TestApp.app/Contents/MacOS/TestApp
+          echo 'echo "Hello from Test App!"' >> TestApp.app/Contents/MacOS/TestApp
+          chmod +x TestApp.app/Contents/MacOS/TestApp
+          
+          cat > TestApp.app/Contents/Info.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleExecutable</key>
+              <string>TestApp</string>
+              <key>CFBundleName</key>
+              <string>TestApp</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.test.testapp</string>
+              <key>CFBundleVersion</key>
+              <string>1.0</string>
+          </dict>
+          </plist>
+          EOF
+      
+      - name: Install create-dmg
+        run: brew install create-dmg
+      
+      - name: Build DMG
+        run: |
+          create-dmg \
+            --volname "TestApp" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --icon "TestApp.app" 175 190 \
+            --hide-extension "TestApp.app" \
+            --app-drop-link 425 190 \
+            "TestApp.dmg" \
+            "TestApp.app" || true
+          
+          # Если create-dmg не сработал, используем hdiutil
+          if [ ! -f "TestApp.dmg" ]; then
+            hdiutil create -volname "TestApp" -srcfolder TestApp.app -ov -format UDZO TestApp.dmg
+          fi
+      
+      - name: Upload DMG
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-dmg
+          path: "*.dmg"
