@@ -32,7 +32,6 @@ jobs:
             --icon-size 100 \
             --icon "test.sh" 175 190 \
             --hide-extension "test.sh" \
-            --custom-icon "test.sh" /System/Applications/Utilities/Terminal.app/Contents/Resources/Terminal.icns \
             --add-file "Terminal" /System/Applications/Utilities/Terminal.app 425 190 \
             "TestScript.dmg" \
             "dmg-contents/"
