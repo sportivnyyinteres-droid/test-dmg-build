@@ -16,9 +16,9 @@ jobs:
       - name: Create test script and symlink
         run: |
           mkdir dmg-contents
-          echo '#!/bin/bash' > dmg-contents/test.xyz
-          echo 'echo "hello"' >> dmg-contents/test.xyz
-          chmod +x dmg-contents/test.xyz
+          echo '#!/bin/bash' > dmg-contents/test.sh
+          echo 'echo "hello"' >> dmg-contents/test.sh
+          chmod +x dmg-contents/test.sh
           
           # Создаём symlink на Terminal
           ln -s /System/Applications/Utilities/Terminal.app dmg-contents/Terminal
@@ -33,8 +33,8 @@ jobs:
             --window-pos 200 120 \
             --window-size 600 400 \
             --icon-size 100 \
-            --icon "test.xyz" 175 190 \
-            --hide-extension "test.xyz" \
+            --icon "test.sh" 175 190 \
+            --hide-extension "test.sh" \
             --icon "Terminal" 425 190 \
             "TestScript.dmg" \
             "dmg-contents/"
