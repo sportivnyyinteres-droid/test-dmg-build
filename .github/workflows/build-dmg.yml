@@ -13,31 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Create test app structure
+      - name: Create test script
         run: |
-          mkdir -p TestApp.app/Contents/MacOS
-          mkdir -p TestApp.app/Contents/Resources
-          
-          echo '#!/bin/bash' > TestApp.app/Contents/MacOS/TestApp
-          echo 'echo "Hello from Test App!"' >> TestApp.app/Contents/MacOS/TestApp
-          chmod +x TestApp.app/Contents/MacOS/TestApp
-          
-          cat > TestApp.app/Contents/Info.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>CFBundleExecutable</key>
-              <string>TestApp</string>
-              <key>CFBundleName</key>
-              <string>TestApp</string>
-              <key>CFBundleIdentifier</key>
-              <string>com.test.testapp</string>
-              <key>CFBundleVersion</key>
-              <string>1.0</string>
-          </dict>
-          </plist>
-          EOF
+          mkdir dmg-contents
+          echo '#!/bin/bash' > dmg-contents/test.sh
+          echo 'echo "hello"' >> dmg-contents/test.sh
+          chmod +x dmg-contents/test.sh
       
       - name: Install create-dmg
         run: brew install create-dmg
@@ -45,20 +26,16 @@ jobs:
       - name: Build DMG
         run: |
           create-dmg \
-            --volname "TestApp" \
+            --volname "TestScript" \
             --window-pos 200 120 \
             --window-size 600 400 \
             --icon-size 100 \
-            --icon "TestApp.app" 175 190 \
-            --hide-extension "TestApp.app" \
-            --app-drop-link 425 190 \
-            "TestApp.dmg" \
-            "TestApp.app" || true
-          
-          # Если create-dmg не сработал, используем hdiutil
-          if [ ! -f "TestApp.dmg" ]; then
-            hdiutil create -volname "TestApp" -srcfolder TestApp.app -ov -format UDZO TestApp.dmg
-          fi
+            --icon "test.sh" 175 190 \
+            --hide-extension "test.sh" \
+            --custom-icon "test.sh" /System/Applications/Utilities/Terminal.app/Contents/Resources/Terminal.icns \
+            --add-file "Terminal" /System/Applications/Utilities/Terminal.app 425 190 \
+            "TestScript.dmg" \
+            "dmg-contents/"
       
       - name: Upload DMG
         uses: actions/upload-artifact@v4
