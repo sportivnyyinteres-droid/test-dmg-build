@@ -13,12 +13,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Create test script
+      - name: Create test script and symlink
         run: |
           mkdir dmg-contents
           echo '#!/bin/bash' > dmg-contents/test.sh
           echo 'echo "hello"' >> dmg-contents/test.sh
           chmod +x dmg-contents/test.sh
+          
+          # Создаём symlink на Terminal
+          ln -s /System/Applications/Utilities/Terminal.app dmg-contents/Terminal
       
       - name: Install create-dmg
         run: brew install create-dmg
@@ -32,7 +35,7 @@ jobs:
             --icon-size 100 \
             --icon "test.sh" 175 190 \
             --hide-extension "test.sh" \
-            --add-file "Terminal" /System/Applications/Utilities/Terminal.app 425 190 \
+            --icon "Terminal" 425 190 \
             "TestScript.dmg" \
             "dmg-contents/"
       
