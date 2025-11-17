@@ -16,8 +16,7 @@ jobs:
       - name: Create test script and symlink
         run: |
           mkdir dmg-contents
-          echo '#!/bin/bash' > dmg-contents/test.xyz
-          echo 'echo "hello"' >> dmg-contents/test.xyz
+          echo 'echo "hello"' > dmg-contents/test.xyz
           chmod +x dmg-contents/test.xyz
           
           # Снимаем карантин с .xyz
